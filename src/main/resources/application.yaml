@@ -1,3 +1,16 @@
 spring:
+  profiles:
+    active: dev
+
+  datasource:
+    url: IT'S A FAKE ONE, PLEASE REPLACE IT WITH YOUR OWN
+    username: IT'S A FAKE ONE, PLEASE REPLACE IT WITH YOUR OWN
+    password: IT'S A FAKE ONE, PLEASE REPLACE IT WITH YOUR OWN
+
   application:
     name: finance-portfolio-backend
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
