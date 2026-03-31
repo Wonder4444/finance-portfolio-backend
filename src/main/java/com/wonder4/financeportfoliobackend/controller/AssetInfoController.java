@@ -7,6 +7,9 @@ import com.wonder4.financeportfoliobackend.common.ApiResult;
 import com.wonder4.financeportfoliobackend.entity.AssetInfo;
 import com.wonder4.financeportfoliobackend.mapper.AssetInfoMapper;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/assets")
+@Tag(name = "AssetInfoController", description = "Assets related api")
 public class AssetInfoController {
 
     private final AssetInfoMapper assetInfoMapper;
@@ -29,6 +33,10 @@ public class AssetInfoController {
 
     /** 新增资产 —— XML: insertAsset (演示 XML insert + 主键回填) */
     @PostMapping
+    @Operation(
+            summary = "Create a new asset",
+            description =
+                    "Creates a new asset and returns the created asset with its generated ID.")
     public ApiResult<AssetInfo> create(@RequestBody AssetInfo assetInfo) {
         assetInfoMapper.insertAsset(assetInfo);
         return ApiResult.success(assetInfo);
@@ -36,12 +44,19 @@ public class AssetInfoController {
 
     /** 根据 id 查询资产 —— XML: selectAssetById */
     @GetMapping("/{id}")
+    @Operation(
+            summary = "Get asset by ID",
+            description = "Retrieves the asset information for the given asset ID.")
     public ApiResult<AssetInfo> getById(@PathVariable Long id) {
         return ApiResult.success(assetInfoMapper.selectAssetById(id));
     }
 
     /** 逻辑删除资产 —— BaseMapper.deleteById() (配合 @TableLogic) */
     @DeleteMapping("/{id}")
+    @Operation(
+            summary = "Delete asset by ID",
+            description =
+                    "Deletes the asset with the given ID. This is a logical delete, so the record will not be physically removed from the database.")
     public ApiResult<Void> delete(@PathVariable Long id) {
         assetInfoMapper.deleteById(id);
         return ApiResult.success();
@@ -49,6 +64,10 @@ public class AssetInfoController {
 
     /** 更新资产信息 —— BaseMapper.updateById() */
     @PutMapping("/{id}")
+    @Operation(
+            summary = "Update asset by ID",
+            description =
+                    "Updates the asset information for the given asset ID. The request body should contain the updated asset information.")
     public ApiResult<AssetInfo> update(@PathVariable Long id, @RequestBody AssetInfo assetInfo) {
         assetInfo.setId(id);
         assetInfoMapper.updateById(assetInfo);
@@ -57,12 +76,19 @@ public class AssetInfoController {
 
     /** 查询全部资产 —— BaseMapper.selectList() + QueryWrapper */
     @GetMapping
+    @Operation(
+            summary = "List all assets",
+            description = "Retrieves a list of all assets in the system.")
     public ApiResult<List<AssetInfo>> list() {
         return ApiResult.success(assetInfoMapper.selectList(new QueryWrapper<>()));
     }
 
     /** 分页查询资产 —— XML: selectAssetPage */
     @GetMapping("/page")
+    @Operation(
+            summary = "Paginate assets",
+            description =
+                    "Retrieves a paginated list of assets. You can specify the page number and page size using the 'current' and 'size' query parameters, respectively.")
     public ApiResult<IPage<AssetInfo>> page(
             @RequestParam(defaultValue = "1") long current,
             @RequestParam(defaultValue = "10") long size) {
