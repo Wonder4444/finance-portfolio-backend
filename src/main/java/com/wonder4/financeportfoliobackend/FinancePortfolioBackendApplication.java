@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class FinancePortfolioBackendApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(FinancePortfolioBackendApplication.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(FinancePortfolioBackendApplication.class, args);
+    }
 }

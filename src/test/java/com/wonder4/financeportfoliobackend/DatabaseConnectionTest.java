@@ -14,16 +14,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 public class DatabaseConnectionTest {
 
-  @Autowired private DataSource dataSource;
+    @Autowired private DataSource dataSource;
 
-  @Test
-  void testConnection() throws SQLException {
-    System.out.println("start");
-    try (Connection connection = dataSource.getConnection()) {
-      assertNotNull(connection);
-      assertTrue(connection.isValid(1));
-      System.out.println("Connection built: " + connection.getMetaData().getURL());
+    @Test
+    void testConnection() throws SQLException {
+        System.out.println("start");
+        try (Connection connection = dataSource.getConnection()) {
+            assertNotNull(connection);
+            assertTrue(connection.isValid(1));
+            System.out.println("Connection built: " + connection.getMetaData().getURL());
+        }
+        System.out.println("end");
     }
-    System.out.println("end");
-  }
 }
