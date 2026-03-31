@@ -49,4 +49,16 @@
         ORDER BY id ASC
     </select>
 
+    <!-- XML: 获取用户的投资组合总资产与总成本 -->
+    <select id="getPortfolioOverviewStats"
+            resultType="com.wonder4.financeportfoliobackend.entity.dto.PortfolioOverviewDTO">
+        SELECT COALESCE(SUM(uh.quantity * ai.current_price), 0) AS totalBalance,
+               COALESCE(SUM(uh.quantity * uh.avg_cost), 0)      AS totalCost
+        FROM user_holding uh
+                 INNER JOIN asset_info ai ON uh.asset_id = ai.id
+        WHERE uh.user_id = #{userId}
+          AND uh.is_deleted = 0
+          AND ai.is_deleted = 0
+    </select>
+
 </mapper>

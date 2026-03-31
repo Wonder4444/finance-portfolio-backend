@@ -75,6 +75,8 @@ class UserHoldingControllerTest {
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.userId").value(userId))
                 .andExpect(jsonPath("$.data.id").isNotEmpty());
+
+        holdingId = userHoldingMapper.selectList(null).get(0).getId();
     }
 
     @Test
