@@ -2,6 +2,7 @@ package com.wonder4.financeportfoliobackend.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.wonder4.financeportfoliobackend.entity.UserHolding;
+import com.wonder4.financeportfoliobackend.entity.dto.PortfolioOverviewDTO;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -28,4 +29,7 @@ public interface UserHoldingMapper extends BaseMapper<UserHolding> {
 
     /** XML: 查询全部持仓 */
     List<UserHolding> selectAllHoldings();
+
+    /** XML: 获取总资产和总成本聚合 */
+    PortfolioOverviewDTO getPortfolioOverviewStats(@Param("userId") Long userId);
 }
