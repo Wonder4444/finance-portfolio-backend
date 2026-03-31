@@ -1,7 +1,8 @@
 package com.wonder4.financeportfoliobackend.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.wonder4.financeportfoliobackend.entity.AssetInfo;
 import com.wonder4.financeportfoliobackend.entity.UserHolding;
@@ -74,13 +75,6 @@ class UserHoldingControllerTest {
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.userId").value(userId))
                 .andExpect(jsonPath("$.data.id").isNotEmpty());
-
-        holdingId =
-                userHoldingMapper.selectAllHoldings().stream()
-                        .filter(h -> h.getUserId().equals(userId))
-                        .findFirst()
-                        .get()
-                        .getId();
     }
 
     @Test
