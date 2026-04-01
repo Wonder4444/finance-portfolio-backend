@@ -44,4 +44,20 @@
             asset_type = VALUES(asset_type)
     </insert>
 
+    <!-- XML: Global Fuzzy Search (Limits to 50 results) -->
+    <select id="searchAssets" resultType="com.wonder4.financeportfoliobackend.entity.AssetInfo">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM asset_info
+        WHERE is_deleted = 0
+        <if test="keyword != null and keyword != ''">
+            AND (
+                symbol LIKE CONCAT('%', #{keyword}, '%')
+                OR full_name LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+        ORDER BY symbol ASC
+        LIMIT 50
+    </select>
+
 </mapper>

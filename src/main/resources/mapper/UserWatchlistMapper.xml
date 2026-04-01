@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wonder4.financeportfoliobackend.mapper.UserWatchlistMapper">
+
+    <select id="selectWatchlistWithAssetInfo" resultType="com.wonder4.financeportfoliobackend.entity.vo.UserWatchlistVO">
+        SELECT 
+            w.id,
+            w.user_id,
+            w.asset_id,
+            w.create_time,
+            a.symbol,
+            a.full_name,
+            a.asset_type,
+            a.current_price
+        FROM user_watchlist w
+        INNER JOIN asset_info a ON w.asset_id = a.id
+        WHERE w.user_id = #{userId}
+          AND w.is_deleted = 0
+          AND a.is_deleted = 0
+          
+        <if test="keyword != null and keyword != ''">
+            AND (
+                a.symbol LIKE CONCAT('%', #{keyword}, '%')
+                OR a.full_name LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+        
+        ORDER BY w.create_time DESC
+    </select>
+
+</mapper>

@@ -74,7 +74,15 @@ public class AssetInfoServiceImpl implements AssetInfoService {
     @Override
     public IPage<AssetInfo> page(long current, long size) {
         log.info("Paginating AssetInfo records: current={}, size={}", current, size);
-
         return assetInfoMapper.selectAssetPage(new Page<>(current, size));
+    }
+
+    @Override
+    public List<AssetInfo> searchList(String keyword) {
+        log.info("Fuzzy searching AssetInfo records with keyword: {}", keyword);
+        if (keyword == null || keyword.trim().isEmpty()) {
+            throw new BusinessException(400, "Search keyword cannot be empty");
+        }
+        return assetInfoMapper.searchAssets(keyword.trim());
     }
 }
