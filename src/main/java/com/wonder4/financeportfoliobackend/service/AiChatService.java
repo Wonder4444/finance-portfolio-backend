@@ -7,19 +7,25 @@ import com.wonder4.financeportfoliobackend.dto.UserHoldingWithInfoDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import tools.jackson.databind.ObjectMapper;
+
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class AiChatService {
 
     private final AiAssistant aiAssistant;
     private final UserHoldingService userHoldingService;
+    private final ObjectMapper objectMapper;
 
-    public AiChatService(AiAssistant aiAssistant, UserHoldingService userHoldingService) {
+    public AiChatService(
+            AiAssistant aiAssistant,
+            UserHoldingService userHoldingService,
+            ObjectMapper objectMapper) {
         this.aiAssistant = aiAssistant;
         this.userHoldingService = userHoldingService;
+        this.objectMapper = objectMapper;
     }
 
     public AiChatResponse chat(AiChatRequest request) {
@@ -52,19 +58,6 @@ public class AiChatService {
             return "The user currently has no holdings in their portfolio.";
         }
 
-        return holdings.stream()
-                .map(
-                        h ->
-                                String.format(
-                                        "- Asset ID: %d (Symbol: %s, Name: %s), Quantity: %s, Average Cost: %s, Current Price: %s",
-                                        h.getAssetId(),
-                                        h.getSymbol() != null ? h.getSymbol() : "Unknown",
-                                        h.getFullName() != null ? h.getFullName() : "Unknown",
-                                        h.getQuantity() != null ? h.getQuantity().toString() : "0",
-                                        h.getAvgCost() != null ? h.getAvgCost().toString() : "0",
-                                        h.getCurrentPrice() != null
-                                                ? h.getCurrentPrice().toString()
-                                                : "0"))
-                .collect(Collectors.joining("\n"));
+        return objectMapper.writeValueAsString(holdings);
     }
 }

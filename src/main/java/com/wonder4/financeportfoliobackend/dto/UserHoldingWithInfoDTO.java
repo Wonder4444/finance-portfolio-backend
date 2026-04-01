@@ -13,9 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserHoldingWithInfoDTO {
-    private Long id;
-    private Long userId;
-    private Long assetId;
+
     private BigDecimal quantity;
     private BigDecimal avgCost;
     private Integer isDeleted;
@@ -26,5 +24,4 @@ public class UserHoldingWithInfoDTO {
     private String symbol;
     private String fullName;
     private String assetType;
-    private BigDecimal currentPrice;
 }
