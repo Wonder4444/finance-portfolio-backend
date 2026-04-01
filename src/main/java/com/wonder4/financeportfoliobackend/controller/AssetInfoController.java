@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.wonder4.financeportfoliobackend.common.ApiResult;
 import com.wonder4.financeportfoliobackend.entity.AssetInfo;
 import com.wonder4.financeportfoliobackend.service.AssetInfoService;
+import com.wonder4.financeportfoliobackend.task.AssetSyncTask;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,9 +20,18 @@ import java.util.List;
 public class AssetInfoController {
 
     private final AssetInfoService assetInfoService;
+    private final AssetSyncTask assetSyncTask;
 
-    public AssetInfoController(AssetInfoService assetInfoService) {
+    public AssetInfoController(AssetInfoService assetInfoService, AssetSyncTask assetSyncTask) {
         this.assetInfoService = assetInfoService;
+        this.assetSyncTask = assetSyncTask;
+    }
+
+    @PostMapping("/sync")
+    @Operation(summary = "Manually trigger the asset sync task")
+    public ApiResult<Void> triggerManualSync() {
+        assetSyncTask.dailySync();
+        return ApiResult.success();
     }
 
     @PostMapping
@@ -61,5 +71,11 @@ public class AssetInfoController {
             @RequestParam(defaultValue = "1") long current,
             @RequestParam(defaultValue = "10") long size) {
         return ApiResult.success(assetInfoService.page(current, size));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Fuzzy search assets globally by symbol or full name (capped at 50 results)")
+    public ApiResult<List<AssetInfo>> search(@RequestParam String keyword) {
+        return ApiResult.success(assetInfoService.searchList(keyword));
     }
 }

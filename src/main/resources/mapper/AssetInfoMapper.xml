@@ -32,4 +32,32 @@
         ORDER BY id ASC
     </select>
 
+    <!-- XML: Batch Upsert Assets (Sync Task) -->
+    <insert id="insertOrUpdateBatch">
+        INSERT INTO asset_info (symbol, full_name, asset_type, current_price)
+        VALUES 
+        <foreach collection="list" item="item" separator=",">
+            (#{item.symbol}, #{item.fullName}, #{item.assetType}, IFNULL(#{item.currentPrice}, 0))
+        </foreach>
+        ON DUPLICATE KEY UPDATE 
+            full_name = VALUES(full_name),
+            asset_type = VALUES(asset_type)
+    </insert>
+
+    <!-- XML: Global Fuzzy Search (Limits to 50 results) -->
+    <select id="searchAssets" resultType="com.wonder4.financeportfoliobackend.entity.AssetInfo">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM asset_info
+        WHERE is_deleted = 0
+        <if test="keyword != null and keyword != ''">
+            AND (
+                symbol LIKE CONCAT('%', #{keyword}, '%')
+                OR full_name LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+        ORDER BY symbol ASC
+        LIMIT 50
+    </select>
+
 </mapper>

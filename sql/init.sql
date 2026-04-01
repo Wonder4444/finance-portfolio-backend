@@ -46,4 +46,19 @@ CREATE TABLE `user_holding` (
                                 UNIQUE KEY `uk_user_asset` (`user_id`, `asset_id`) COMMENT 'Ensures unique entry per asset per user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='User asset holdings and cost basis';
 
+-- 4. Table: user_watchlist
+DROP TABLE IF EXISTS `user_watchlist`;
+CREATE TABLE `user_watchlist` (
+                                  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Primary Key: Watchlist record ID',
+                                  `user_id` BIGINT NOT NULL COMMENT 'Logical FK: Reference to user_info.id',
+                                  `asset_id` BIGINT NOT NULL COMMENT 'Logical FK: Reference to asset_info.id',
+                                  `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0=active, 1=deleted',
+                                  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Creation time',
+                                  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+                                  PRIMARY KEY (`id`),
+                                  INDEX `idx_user_id` (`user_id`) COMMENT 'Performance index for user watchlist lookup',
+                                  UNIQUE KEY `uk_user_asset_watch` (`user_id`, `asset_id`) COMMENT 'Ensures unique entry per asset per user'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='User asset watchlist';
+
+
 SET FOREIGN_KEY_CHECKS = 1;

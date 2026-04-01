@@ -17,4 +17,6 @@ public interface AssetInfoService {
     List<AssetInfo> list();
 
     IPage<AssetInfo> page(long current, long size);
+
+    List<AssetInfo> searchList(String keyword);
 }
