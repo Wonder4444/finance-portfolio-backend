@@ -2,6 +2,7 @@ package com.wonder4.financeportfoliobackend.task;
 
 import com.wonder4.financeportfoliobackend.entity.AssetInfo;
 import com.wonder4.financeportfoliobackend.mapper.AssetInfoMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,16 +25,16 @@ public class AssetSyncTask {
 
     // A static list of top mainstream cryptocurrencies for the asset_info table
     private static final String[][] TOP_CRYPTOS = {
-            {"BTC-USD", "Bitcoin"},
-            {"ETH-USD", "Ethereum"},
-            {"USDT-USD", "Tether"},
-            {"BNB-USD", "BNB"},
-            {"SOL-USD", "Solana"},
-            {"XRP-USD", "XRP"},
-            {"USDC-USD", "USDC"},
-            {"ADA-USD", "Cardano"},
-            {"AVAX-USD", "Avalanche"},
-            {"DOGE-USD", "Dogecoin"}
+        {"BTC-USD", "Bitcoin"},
+        {"ETH-USD", "Ethereum"},
+        {"USDT-USD", "Tether"},
+        {"BNB-USD", "BNB"},
+        {"SOL-USD", "Solana"},
+        {"XRP-USD", "XRP"},
+        {"USDC-USD", "USDC"},
+        {"ADA-USD", "Cardano"},
+        {"AVAX-USD", "Avalanche"},
+        {"DOGE-USD", "Dogecoin"}
     };
 
     public AssetSyncTask(AssetInfoMapper assetInfoMapper) {
@@ -41,8 +42,8 @@ public class AssetSyncTask {
     }
 
     /**
-     * Executes Every Day at 2:00 AM Server Time
-     * Note: @PostConstruct was removed to prevent auto-insertion from breaking JUnit integration tests.
+     * Executes Every Day at 2:00 AM Server Time Note: @PostConstruct was removed to prevent
+     * auto-insertion from breaking JUnit integration tests.
      */
     @Scheduled(cron = "0 0 2 * * ?")
     public void dailySync() {
@@ -58,7 +59,8 @@ public class AssetSyncTask {
             asset.setSymbol(crypto[0]);
             asset.setFullName(crypto[1]);
             asset.setAssetType("CRYPTO");
-            asset.setCurrentPrice(BigDecimal.ZERO); // Optional: actual price updated by another price sync task
+            asset.setCurrentPrice(
+                    BigDecimal.ZERO); // Optional: actual price updated by another price sync task
             cryptoBatch.add(asset);
         }
 
@@ -71,7 +73,7 @@ public class AssetSyncTask {
             "https://raw.githubusercontent.com/datasets/nasdaq-listings/master/data/nasdaq-listed.csv",
             "https://raw.githubusercontent.com/datasets/nyse-other-listings/master/data/nyse-listed.csv"
         };
-        
+
         for (String httpsUrl : csvUrls) {
             log.info("Connecting to official HTTPS mirror directory: {}", httpsUrl);
             try {
@@ -80,7 +82,8 @@ public class AssetSyncTask {
                 conn.setConnectTimeout(10000);
                 conn.setReadTimeout(30000);
 
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                try (BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
                     String line;
                     boolean isHeader = true;
                     List<AssetInfo> batch = new ArrayList<>();
@@ -102,11 +105,11 @@ public class AssetSyncTask {
                         if (parts.length == 2) {
                             AssetInfo asset = new AssetInfo();
                             asset.setSymbol(parts[0].trim());
-                            
+
                             // Clean up surrounding quotes from CSV name
                             String cleanName = parts[1].trim().replaceAll("^\"|\"$", "");
                             asset.setFullName(cleanName);
-                            
+
                             asset.setAssetType("STOCK");
                             asset.setCurrentPrice(BigDecimal.ZERO);
                             batch.add(asset);
@@ -128,7 +131,10 @@ public class AssetSyncTask {
                     log.info("Successfully synchronized {} US Stocks from roster.", totalProcessed);
                 }
             } catch (Exception e) {
-                log.error("Failed to sync stocks from HTTPS directory {}. retrying tomorrow. Error: {}", httpsUrl, e.getMessage());
+                log.error(
+                        "Failed to sync stocks from HTTPS directory {}. retrying tomorrow. Error: {}",
+                        httpsUrl,
+                        e.getMessage());
             }
         }
     }

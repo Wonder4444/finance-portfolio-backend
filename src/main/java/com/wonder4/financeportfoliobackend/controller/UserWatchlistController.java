@@ -7,6 +7,7 @@ import com.wonder4.financeportfoliobackend.service.UserWatchlistService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/watchlist")
 @RequiredArgsConstructor
-@Tag(name = "UserWatchlistController", description = "Watchlist / Favorites api for frontend dashboard")
+@Tag(
+        name = "UserWatchlistController",
+        description = "Watchlist / Favorites api for frontend dashboard")
 public class UserWatchlistController {
 
     private final UserWatchlistService userWatchlistService;
@@ -37,8 +40,7 @@ public class UserWatchlistController {
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get user's watchlist with optional fuzzy search by symbol or name")
     public ApiResult<List<UserWatchlistVO>> getUserWatchlist(
-            @PathVariable Long userId,
-            @RequestParam(required = false) String keyword) {
+            @PathVariable Long userId, @RequestParam(required = false) String keyword) {
         return ApiResult.success(userWatchlistService.getUserWatchlist(userId, keyword));
     }
 }

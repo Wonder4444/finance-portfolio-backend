@@ -29,3 +29,12 @@ mybatis-plus:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+ai:
+  ollama:
+    base-url: http://localhost:11434
+    model-name: llama3.2
+
+logging:
+  level:
+    dev.langchain4j: DEBUG
