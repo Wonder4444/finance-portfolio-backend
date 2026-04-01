@@ -74,7 +74,8 @@ public class AssetInfoController {
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Fuzzy search assets globally by symbol or full name (capped at 50 results)")
+    @Operation(
+            summary = "Fuzzy search assets globally by symbol or full name (capped at 50 results)")
     public ApiResult<List<AssetInfo>> search(@RequestParam String keyword) {
         return ApiResult.success(assetInfoService.searchList(keyword));
     }

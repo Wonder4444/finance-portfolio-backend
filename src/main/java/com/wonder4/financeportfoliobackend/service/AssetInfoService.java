@@ -6,6 +6,7 @@ import com.wonder4.financeportfoliobackend.entity.AssetInfo;
 import java.util.List;
 
 public interface AssetInfoService {
+
     AssetInfo create(AssetInfo assetInfo);
 
     AssetInfo getById(Long id);

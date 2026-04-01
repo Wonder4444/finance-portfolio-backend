@@ -4,8 +4,10 @@ import com.wonder4.financeportfoliobackend.entity.dto.PortfolioOverviewDTO;
 import com.wonder4.financeportfoliobackend.entity.vo.PortfolioOverviewVO;
 import com.wonder4.financeportfoliobackend.mapper.UserHoldingMapper;
 import com.wonder4.financeportfoliobackend.service.PortfolioOverviewService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -43,7 +45,8 @@ public class PortfolioOverviewServiceImpl implements PortfolioOverviewService {
                             .multiply(new BigDecimal("100"));
         }
 
-        log.info("For user ID:{}, calculated total balance: {}, total cost: {}, calculated profit/loss: {}, return rate: {}%",
+        log.info(
+                "For user ID:{}, calculated total balance: {}, total cost: {}, calculated profit/loss: {}, return rate: {}%",
                 userId, totalBalance, totalCost, profitLoss, returnRate);
 
         return PortfolioOverviewVO.builder()

@@ -12,6 +12,7 @@ import com.wonder4.financeportfoliobackend.mapper.UserWatchlistMapper;
 import com.wonder4.financeportfoliobackend.service.UserWatchlistService;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,9 +41,8 @@ public class UserWatchlistServiceImpl implements UserWatchlistService {
 
         // Check for existing watch record to prevent duplicates
         LambdaQueryWrapper<UserWatchlist> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(UserWatchlist::getUserId, userId)
-                    .eq(UserWatchlist::getAssetId, assetId);
-        
+        queryWrapper.eq(UserWatchlist::getUserId, userId).eq(UserWatchlist::getAssetId, assetId);
+
         UserWatchlist existing = userWatchlistMapper.selectOne(queryWrapper);
         if (existing != null) {
             // Already watchlisted, safe return
@@ -52,7 +52,7 @@ public class UserWatchlistServiceImpl implements UserWatchlistService {
         UserWatchlist newWatch = new UserWatchlist();
         newWatch.setUserId(userId);
         newWatch.setAssetId(assetId);
-        
+
         userWatchlistMapper.insert(newWatch);
         return newWatch;
     }
@@ -73,7 +73,7 @@ public class UserWatchlistServiceImpl implements UserWatchlistService {
         if (user == null) {
             throw new BusinessException(404, "Target user not found");
         }
-        
+
         // Let the XML join query handle fuzzy param seamlessly
         return userWatchlistMapper.selectWatchlistWithAssetInfo(userId, keyword);
     }
