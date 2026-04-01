@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wonder4.financeportfoliobackend.mapper.AssetInfoMapper">
+
+    <!-- 通用列 -->
+    <sql id="baseColumns">
+        id
+        , symbol, full_name, asset_type, current_price, is_deleted, create_time, update_time
+    </sql>
+
+    <!-- XML: 新增资产 (演示 XML insert 写法, 自增主键回填) -->
+    <insert id="insertAsset" useGeneratedKeys="true" keyProperty="entity.id">
+        INSERT INTO asset_info (symbol, full_name, asset_type, current_price)
+        VALUES (#{entity.symbol}, #{entity.fullName}, #{entity.assetType}, #{entity.currentPrice})
+    </insert>
+
+    <!-- XML: 根据 id 查询资产 -->
+    <select id="selectAssetById" resultType="com.wonder4.financeportfoliobackend.entity.AssetInfo">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM asset_info
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <!-- XML: 分页查询资产 (MyBatis Plus 自动处理分页) -->
+    <select id="selectAssetPage" resultType="com.wonder4.financeportfoliobackend.entity.AssetInfo">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM asset_info
+        WHERE is_deleted = 0
+        ORDER BY id ASC
+    </select>
+
+    <!-- XML: Batch Upsert Assets (Sync Task) -->
+    <insert id="insertOrUpdateBatch">
+        INSERT INTO asset_info (symbol, full_name, asset_type, current_price)
+        VALUES 
+        <foreach collection="list" item="item" separator=",">
+            (#{item.symbol}, #{item.fullName}, #{item.assetType}, IFNULL(#{item.currentPrice}, 0))
+        </foreach>
+        ON DUPLICATE KEY UPDATE 
+            full_name = VALUES(full_name),
+            asset_type = VALUES(asset_type)
+    </insert>
+
+    <!-- XML: Global Fuzzy Search (Limits to 50 results) -->
+    <select id="searchAssets" resultType="com.wonder4.financeportfoliobackend.entity.AssetInfo">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM asset_info
+        WHERE is_deleted = 0
+        <if test="keyword != null and keyword != ''">
+            AND (
+                symbol LIKE CONCAT('%', #{keyword}, '%')
+                OR full_name LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+        ORDER BY symbol ASC
+        LIMIT 50
+    </select>
+
+</mapper>

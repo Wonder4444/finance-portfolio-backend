@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wonder4.financeportfoliobackend.mapper.UserHoldingMapper">
+
+    <!-- 通用列 -->
+    <sql id="baseColumns">
+        id
+        , user_id, asset_id, quantity, avg_cost, is_deleted, create_time, update_time
+    </sql>
+
+    <!-- XML: 逻辑删除持仓 (UPDATE is_deleted) -->
+    <update id="deleteHoldingById">
+        UPDATE user_holding
+        SET is_deleted  = 1,
+            update_time = NOW()
+        WHERE id = #{id}
+          AND is_deleted = 0
+    </update>
+
+    <!-- XML: 根据 id 更新持仓信息 (动态 SQL) -->
+    <update id="updateHoldingById">
+        UPDATE user_holding
+        <set>
+            <if test="entity.userId != null">user_id = #{entity.userId},</if>
+            <if test="entity.assetId != null">asset_id = #{entity.assetId},</if>
+            <if test="entity.quantity != null">quantity = #{entity.quantity},</if>
+            <if test="entity.avgCost != null">avg_cost = #{entity.avgCost},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{entity.id} AND is_deleted = 0
+    </update>
+
+    <!-- XML: 根据 userId 查询持仓列表 -->
+    <select id="selectByUserId" resultType="com.wonder4.financeportfoliobackend.entity.UserHolding">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM user_holding
+        WHERE user_id = #{userId} AND is_deleted = 0
+        ORDER BY id ASC
+    </select>
+
+    <!-- XML: 查询全部持仓 -->
+    <select id="selectAllHoldings" resultType="com.wonder4.financeportfoliobackend.entity.UserHolding">
+        SELECT
+        <include refid="baseColumns"/>
+        FROM user_holding
+        WHERE is_deleted = 0
+        ORDER BY id ASC
+    </select>
+
+    <!-- XML: 获取用户的投资组合总资产与总成本 -->
+    <select id="getPortfolioOverviewStats"
+            resultType="com.wonder4.financeportfoliobackend.entity.dto.PortfolioOverviewDTO">
+        SELECT COALESCE(SUM(uh.quantity * ai.current_price), 0) AS totalBalance,
+               COALESCE(SUM(uh.quantity * uh.avg_cost), 0)      AS totalCost
+        FROM user_holding uh
+                 INNER JOIN asset_info ai ON uh.asset_id = ai.id
+        WHERE uh.user_id = #{userId}
+          AND uh.is_deleted = 0
+          AND ai.is_deleted = 0
+    </select>
+
+    <!-- XML: 根据 userId 查询持仓列表并关联资产信息 -->
+    <select id="selectByUserIdWithInfo" resultType="com.wonder4.financeportfoliobackend.dto.UserHoldingWithInfoDTO">
+        SELECT
+            uh.id,
+            uh.user_id AS userId,
+            uh.asset_id AS assetId,
+            uh.quantity,
+            uh.avg_cost AS avgCost,
+            uh.is_deleted AS isDeleted,
+            uh.create_time AS createTime,
+            uh.update_time AS updateTime,
+            ai.symbol,
+            ai.full_name AS fullName,
+            ai.asset_type AS assetType,
+            ai.current_price AS currentPrice
+        FROM user_holding uh
+        LEFT JOIN asset_info ai ON uh.asset_id = ai.id AND ai.is_deleted = 0
+        WHERE uh.user_id = #{userId} AND uh.is_deleted = 0
+        ORDER BY uh.id ASC
+    </select>
+
+</mapper>
