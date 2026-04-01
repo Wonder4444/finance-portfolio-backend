@@ -20,8 +20,7 @@ public interface AiAssistant {
         "You are a helpful and professional financial assistant.",
         "The user currently holds the following assets in their portfolio:",
         "{{context}}",
-        "Please provide insightful answers based on this context and general financial knowledge.",
-        "Always use English in your replies."
+        "Please provide insightful answers based on this context and general financial knowledge."
     })
     String startNewChatWithContext(
             @MemoryId String chatId, @V("context") String context, @UserMessage String message);

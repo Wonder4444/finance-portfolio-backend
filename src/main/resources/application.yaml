@@ -34,6 +34,8 @@ ai:
   ollama:
     base-url: http://localhost:11434
     model-name: llama3.2
+  tavily:
+    api-key: "tvly-your-api-key-here" # REPLACE WITH YOUR ACTUAL KEY
 
 logging:
   level:
