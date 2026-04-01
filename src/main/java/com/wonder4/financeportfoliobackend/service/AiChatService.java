@@ -2,7 +2,7 @@ package com.wonder4.financeportfoliobackend.service;
 
 import com.wonder4.financeportfoliobackend.dto.AiChatRequest;
 import com.wonder4.financeportfoliobackend.dto.AiChatResponse;
-import com.wonder4.financeportfoliobackend.entity.UserHolding;
+import com.wonder4.financeportfoliobackend.dto.UserHoldingWithInfoDTO;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -46,7 +46,7 @@ public class AiChatService {
             return "The user currently has no holdings or the user is unknown.";
         }
 
-        List<UserHolding> holdings = userHoldingService.listByUserId(userId);
+        List<UserHoldingWithInfoDTO> holdings = userHoldingService.listByUserIdWithInfo(userId);
 
         if (holdings == null || holdings.isEmpty()) {
             return "The user currently has no holdings in their portfolio.";
@@ -56,10 +56,15 @@ public class AiChatService {
                 .map(
                         h ->
                                 String.format(
-                                        "- Asset ID: %d, Quantity: %s, Average Cost: %s",
+                                        "- Asset ID: %d (Symbol: %s, Name: %s), Quantity: %s, Average Cost: %s, Current Price: %s",
                                         h.getAssetId(),
+                                        h.getSymbol() != null ? h.getSymbol() : "Unknown",
+                                        h.getFullName() != null ? h.getFullName() : "Unknown",
                                         h.getQuantity() != null ? h.getQuantity().toString() : "0",
-                                        h.getAvgCost() != null ? h.getAvgCost().toString() : "0"))
+                                        h.getAvgCost() != null ? h.getAvgCost().toString() : "0",
+                                        h.getCurrentPrice() != null
+                                                ? h.getCurrentPrice().toString()
+                                                : "0"))
                 .collect(Collectors.joining("\n"));
     }
 }

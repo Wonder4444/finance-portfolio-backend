@@ -1,6 +1,7 @@
 package com.wonder4.financeportfoliobackend.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.wonder4.financeportfoliobackend.dto.UserHoldingWithInfoDTO;
 import com.wonder4.financeportfoliobackend.entity.UserHolding;
 
 import java.util.List;
@@ -17,6 +18,8 @@ public interface UserHoldingService {
     List<UserHolding> list();
 
     List<UserHolding> listByUserId(Long userId);
+
+    List<UserHoldingWithInfoDTO> listByUserIdWithInfo(Long userId);
 
     IPage<UserHolding> page(long current, long size);
 }

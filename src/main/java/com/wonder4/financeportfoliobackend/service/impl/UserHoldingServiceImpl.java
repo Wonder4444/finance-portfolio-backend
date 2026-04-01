@@ -3,6 +3,7 @@ package com.wonder4.financeportfoliobackend.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wonder4.financeportfoliobackend.common.BusinessException;
+import com.wonder4.financeportfoliobackend.dto.UserHoldingWithInfoDTO;
 import com.wonder4.financeportfoliobackend.entity.UserHolding;
 import com.wonder4.financeportfoliobackend.mapper.UserHoldingMapper;
 import com.wonder4.financeportfoliobackend.service.UserHoldingService;
@@ -84,5 +85,12 @@ public class UserHoldingServiceImpl implements UserHoldingService {
         log.info("Paginating UserHoldings: current={}, size={}", current, size);
 
         return userHoldingMapper.selectPage(new Page<>(current, size), null);
+    }
+
+    @Override
+    public List<UserHoldingWithInfoDTO> listByUserIdWithInfo(Long userId) {
+        log.info("Listing UserHoldings with AssetInfo for user ID: {}", userId);
+
+        return userHoldingMapper.selectByUserIdWithInfo(userId);
     }
 }
