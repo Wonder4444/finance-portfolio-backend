@@ -24,4 +24,7 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 
     /** XML: 分页查询资产 */
     IPage<AssetInfo> selectAssetPage(IPage<AssetInfo> page);
+
+    /** XML: 批量新增或更新资产 (以 symbol 为唯一键) */
+    int insertOrUpdateBatch(@Param("list") java.util.List<AssetInfo> assetInfoList);
 }
