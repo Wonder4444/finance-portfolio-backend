@@ -21,6 +21,10 @@ public interface AssetInfoService {
 
     List<AssetInfo> searchList(String keyword);
 
+    List<AssetInfo> getTopStocks();
+
+    List<AssetInfo> getTopCryptos();
+
     int updatePriceBatch(List<AssetInfo> list);
 
     /**

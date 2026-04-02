@@ -84,9 +84,20 @@ public class AssetInfoController {
     }
 
     @GetMapping("/search")
-    @Operation(
-            summary = "Fuzzy search assets globally by symbol or full name (capped at 50 results)")
+    @Operation(summary = "Fuzzy search assets globally by symbol or full name (capped at 50 results)")
     public ApiResult<List<AssetInfo>> search(@RequestParam String keyword) {
         return ApiResult.success(assetInfoService.searchList(keyword));
+    }
+
+    @GetMapping("/top-stocks")
+    @Operation(summary = "Get top 6 US companies by market cap")
+    public ApiResult<List<AssetInfo>> getTopStocks() {
+        return ApiResult.success(assetInfoService.getTopStocks());
+    }
+
+    @GetMapping("/top-cryptos")
+    @Operation(summary = "Get top 6 cryptocurrencies by market cap")
+    public ApiResult<List<AssetInfo>> getTopCryptos() {
+        return ApiResult.success(assetInfoService.getTopCryptos());
     }
 }
