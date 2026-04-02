@@ -27,8 +27,6 @@ public interface AssetInfoService {
 
     int updatePriceBatch(List<AssetInfo> list);
 
-    /**
-     * Trigger manual sync process for prices.
-     */
+    /** Trigger manual sync process for prices. */
     void manuallySyncPrices();
 }

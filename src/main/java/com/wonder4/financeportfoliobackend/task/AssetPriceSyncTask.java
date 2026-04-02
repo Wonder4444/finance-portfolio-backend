@@ -2,7 +2,9 @@ package com.wonder4.financeportfoliobackend.task;
 
 import com.wonder4.financeportfoliobackend.entity.AssetInfo;
 import com.wonder4.financeportfoliobackend.service.AssetInfoService;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,13 +19,12 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Scheduled task to sync asset prices from Yahoo Finance.
- * Uses the sstrickx/yahoofinance-api SDK.
- * 
- * IMPORTANT: Because Yahoo heavily ratelimits (429 Too Many Requests),
- * this task includes a Graceful Fallback (Simulation Mode) that randomly modifies 
- * the old prices by [-2.0%, +2.5%] when the SDK gets blocked, ensuring the 
- * training backend always has lively data for Watchlist and Advisor modules.
+ * Scheduled task to sync asset prices from Yahoo Finance. Uses the sstrickx/yahoofinance-api SDK.
+ *
+ * <p>IMPORTANT: Because Yahoo heavily ratelimits (429 Too Many Requests), this task includes a
+ * Graceful Fallback (Simulation Mode) that randomly modifies the old prices by [-2.0%, +2.5%] when
+ * the SDK gets blocked, ensuring the training backend always has lively data for Watchlist and
+ * Advisor modules.
  */
 @Slf4j
 @Component
@@ -41,9 +42,7 @@ public class AssetPriceSyncTask {
         this.assetInfoService = assetInfoService;
     }
 
-    /**
-     * Nightly Price Sync at 3:00 AM.
-     */
+    /** Nightly Price Sync at 3:00 AM. */
     @Scheduled(cron = "0 0 3 * * ?")
     public void syncPricesFromYahoo() {
         log.info("=== Started Yahoo Finance Asset Price Sync (with Mock Fallback) ===");
@@ -65,16 +64,15 @@ public class AssetPriceSyncTask {
             // 3. Process each chunk
             for (int i = 0; i < chunks.size(); i++) {
                 List<AssetInfo> chunk = chunks.get(i);
-                
-                String[] symbols = chunk.stream()
-                        .map(AssetInfo::getSymbol)
-                        .toArray(String[]::new);
+
+                String[] symbols = chunk.stream().map(AssetInfo::getSymbol).toArray(String[]::new);
 
                 int[] results = fetchAndUpdateChunk(chunk, symbols, i + 1, chunks.size());
                 totalUpdated += results[0];
                 totalSimulated += results[1];
 
-                // Throttle between batches (even if simulating, we pace it out so logs aren't overwhelmingly fast)
+                // Throttle between batches (even if simulating, we pace it out so logs aren't
+                // overwhelmingly fast)
                 if (i < chunks.size() - 1) {
                     try {
                         Thread.sleep(BASE_SLEEP_MS);
@@ -84,8 +82,11 @@ public class AssetPriceSyncTask {
                 }
             }
 
-            log.info("=== Price Sync Complete! Total: {}. Pulled from Yahoo: {}. Simulated locally: {}. ===",
-                    allAssets.size(), totalUpdated, totalSimulated);
+            log.info(
+                    "=== Price Sync Complete! Total: {}. Pulled from Yahoo: {}. Simulated locally: {}. ===",
+                    allAssets.size(),
+                    totalUpdated,
+                    totalSimulated);
 
         } catch (Exception e) {
             log.error("Fatal error during Asset Price Sync.", e);
@@ -93,10 +94,11 @@ public class AssetPriceSyncTask {
     }
 
     /**
-     * Fetches a chunk. If Yahoo drops us (429/Exception), gracefully degenerate to simulated price moves.
-     * Returns an int array [real_updates, simulated_updates]
+     * Fetches a chunk. If Yahoo drops us (429/Exception), gracefully degenerate to simulated price
+     * moves. Returns an int array [real_updates, simulated_updates]
      */
-    private int[] fetchAndUpdateChunk(List<AssetInfo> chunkAssets, String[] symbols, int chunkIndex, int totalChunks) {
+    private int[] fetchAndUpdateChunk(
+            List<AssetInfo> chunkAssets, String[] symbols, int chunkIndex, int totalChunks) {
         int realUpdates = 0;
         int simulatedUpdates = 0;
         Map<String, Stock> stocks = null;
@@ -105,62 +107,141 @@ public class AssetPriceSyncTask {
             // Attempt an API Fetch
             stocks = YahooFinance.get(symbols);
         } catch (Exception e) {
-            log.warn("Chunk {}/{}: Yahoo API blocked (Likely 429). Falling back to Simulation Mode for this batch.", chunkIndex, totalChunks);
+            log.warn(
+                    "Chunk {}/{}: Yahoo API blocked (Likely 429). Falling back to Simulation Mode for this batch.",
+                    chunkIndex,
+                    totalChunks);
         }
 
         List<AssetInfo> updatedChunk = new ArrayList<>();
 
         for (AssetInfo asset : chunkAssets) {
             String symbol = asset.getSymbol();
-            BigDecimal oldPrice = asset.getCurrentPrice();
             BigDecimal newPrice = null;
-
-            // 1. Try resolving successfully fetched price from Yahoo
-            if (stocks != null && stocks.containsKey(symbol) && stocks.get(symbol) != null) {
-                 Stock stock = stocks.get(symbol);
-                 if (stock.getQuote() != null && stock.getQuote().getPrice() != null) {
-                     newPrice = stock.getQuote().getPrice();
-                     realUpdates++;
-                 }
-            }
-
-            // 2. If blocked or Yahoo returned null, use Simulator
-            if (newPrice == null) {
-                newPrice = simulatePrice(oldPrice);
-                simulatedUpdates++;
-            }
 
             // 3. Mark for update
             AssetInfo assetToUpdate = new AssetInfo();
             assetToUpdate.setSymbol(symbol);
-            assetToUpdate.setCurrentPrice(newPrice);
+
+            // 1. Try resolving successfully fetched price from Yahoo
+            if (stocks != null && stocks.containsKey(symbol) && stocks.get(symbol) != null) {
+                Stock stock = stocks.get(symbol);
+                if (stock.getQuote() != null && stock.getQuote().getPrice() != null) {
+                    newPrice = stock.getQuote().getPrice();
+                    assetToUpdate.setCurrentPrice(newPrice);
+                    assetToUpdate.setChangePercent(stock.getQuote().getChangeInPercent());
+                    realUpdates++;
+                }
+                if (stock.getStats() != null) {
+                    assetToUpdate.setMarketCap(stock.getStats().getMarketCap());
+                    assetToUpdate.setPeRatio(stock.getStats().getPe());
+                    assetToUpdate.setPsRatio(stock.getStats().getPriceSales());
+                    assetToUpdate.setPbRatio(stock.getStats().getPriceBook());
+                }
+            }
+
+            // 2. If blocked or Yahoo returned null, use Simulator
+            if (newPrice == null) {
+                simulateMetrics(assetToUpdate, asset);
+                simulatedUpdates++;
+            }
+
             updatedChunk.add(assetToUpdate);
         }
 
         // Flush batch to database
         if (!updatedChunk.isEmpty()) {
             assetInfoService.updatePriceBatch(updatedChunk);
-            log.info("Batch {}/{} processed: {} Real Yahoo | {} Simulated.", 
-                    chunkIndex, totalChunks, realUpdates, simulatedUpdates);
+            log.info(
+                    "Batch {}/{} processed: {} Real Yahoo | {} Simulated.",
+                    chunkIndex,
+                    totalChunks,
+                    realUpdates,
+                    simulatedUpdates);
         }
 
-        return new int[]{realUpdates, simulatedUpdates};
+        return new int[] {realUpdates, simulatedUpdates};
     }
 
-    /**
-     * Generates a lively fake price so the training UI never looks empty.
-     */
-    private BigDecimal simulatePrice(BigDecimal oldPrice) {
+    /** Generates lively fake metrics so the training UI never looks empty. */
+    private void simulateMetrics(AssetInfo target, AssetInfo existing) {
+        BigDecimal oldPrice = existing.getCurrentPrice();
+        BigDecimal newPrice;
+        BigDecimal changePercent;
+
         if (oldPrice != null && oldPrice.compareTo(BigDecimal.ZERO) > 0) {
-            // Fluctuate between -2.0% and +2.5% 
-            // Multiplier = 0.98 + (0.045 * random[0.0, 1.0))
-            double multiplier = 0.98 + (0.045 * rand.nextDouble());
-            return oldPrice.multiply(BigDecimal.valueOf(multiplier)).setScale(2, RoundingMode.HALF_UP);
+            // Fluctuate between -2.0% and +2.5%
+            double deltaPercent = -2.0 + (4.5 * rand.nextDouble());
+            changePercent = BigDecimal.valueOf(deltaPercent).setScale(2, RoundingMode.HALF_UP);
+
+            double multiplier = 1.0 + (deltaPercent / 100.0);
+            newPrice =
+                    oldPrice.multiply(BigDecimal.valueOf(multiplier))
+                            .setScale(2, RoundingMode.HALF_UP);
         } else {
             // First time initialization (if database was 0)
-            // Seed it with a random price somewhere between $10.00 and $300.00
             double seed = 10.0 + (290.0 * rand.nextDouble());
-            return BigDecimal.valueOf(seed).setScale(2, RoundingMode.HALF_UP);
+            newPrice = BigDecimal.valueOf(seed).setScale(2, RoundingMode.HALF_UP);
+            changePercent = BigDecimal.valueOf(0.0).setScale(2, RoundingMode.HALF_UP);
+        }
+
+        target.setCurrentPrice(newPrice);
+        target.setChangePercent(changePercent);
+
+        // Mock market cap slightly if exists, or randomly generate
+        BigDecimal oldCap = existing.getMarketCap();
+        if (oldCap != null && oldCap.compareTo(BigDecimal.ZERO) > 0) {
+            double capMultiplier = 1.0 + (changePercent.doubleValue() / 100.0);
+            target.setMarketCap(
+                    oldCap.multiply(BigDecimal.valueOf(capMultiplier))
+                            .setScale(2, RoundingMode.HALF_UP));
+        } else {
+            // Generate dummy cap between 1B and 100B
+            double dummyCap = 1_000_000_000.0 + (99_000_000_000.0 * rand.nextDouble());
+            target.setMarketCap(BigDecimal.valueOf(dummyCap).setScale(2, RoundingMode.HALF_UP));
+        }
+
+        // Randomize PE/PS/PB if it's a Stock
+        if ("STOCK".equals(existing.getAssetType())) {
+            target.setPeRatio(
+                    existing.getPeRatio() != null
+                            ? existing.getPeRatio()
+                            : BigDecimal.valueOf(10.0 + 30.0 * rand.nextDouble())
+                                    .setScale(2, RoundingMode.HALF_UP));
+            target.setPsRatio(
+                    existing.getPsRatio() != null
+                            ? existing.getPsRatio()
+                            : BigDecimal.valueOf(1.0 + 10.0 * rand.nextDouble())
+                                    .setScale(2, RoundingMode.HALF_UP));
+            target.setPbRatio(
+                    existing.getPbRatio() != null
+                            ? existing.getPbRatio()
+                            : BigDecimal.valueOf(1.0 + 5.0 * rand.nextDouble())
+                                    .setScale(2, RoundingMode.HALF_UP));
+
+            // Assign a stable pseudo-industry if one is missing
+            if (existing.getIndustry() == null) {
+                String[] industries = {
+                    "Technology",
+                    "Healthcare",
+                    "Financials",
+                    "Consumer Discretionary",
+                    "Energy",
+                    "Industrials",
+                    "Communication Services"
+                };
+                target.setIndustry(
+                        industries[Math.abs(existing.getSymbol().hashCode()) % industries.length]);
+            } else {
+                target.setIndustry(existing.getIndustry());
+            }
+        } else {
+            // Keep crypto industry as CRYPTO or null
+            if (existing.getIndustry() == null) {
+                target.setIndustry("Crypto");
+            } else {
+                target.setIndustry(existing.getIndustry());
+            }
         }
     }
 
@@ -168,8 +249,7 @@ public class AssetPriceSyncTask {
     private <T> List<List<T>> chunkList(List<T> list, int size) {
         List<List<T>> partitions = new ArrayList<>();
         for (int i = 0; i < list.size(); i += size) {
-            partitions.add(new ArrayList<>(
-                    list.subList(i, Math.min(list.size(), i + size))));
+            partitions.add(new ArrayList<>(list.subList(i, Math.min(list.size(), i + size))));
         }
         return partitions;
     }
