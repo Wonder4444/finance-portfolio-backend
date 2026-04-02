@@ -87,4 +87,17 @@ public class AssetInfoServiceImpl implements AssetInfoService {
         }
         return assetInfoMapper.searchAssets(keyword.trim());
     }
+
+    @Override
+    public int updatePriceBatch(List<AssetInfo> list) {
+        if (list == null || list.isEmpty()) return 0;
+        return assetInfoMapper.updatePriceBatch(list);
+    }
+
+    @Override
+    public void manuallySyncPrices() {
+        // Will be wired later or can directly call the SyncTask (but better to use Spring Context to get the task)
+        log.info("Manual Yahoo Finance Sync Triggered.");
+        // We will call the Task bean from the Controller. This service mapping can just delegate.
+    }
 }
