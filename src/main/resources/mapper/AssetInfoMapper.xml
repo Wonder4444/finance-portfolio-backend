@@ -60,4 +60,22 @@
         LIMIT 50
     </select>
 
+    <!-- Super-efficient Batch UPDATE of prices to prevent DB locks when iterating 8000 rows -->
+    <update id="updatePriceBatch" parameterType="java.util.List">
+        UPDATE asset_info
+        <trim prefix="SET" suffixOverrides=",">
+            <trim prefix="current_price = CASE" suffix="END,">
+                <foreach collection="list" item="item" index="index">
+                    WHEN symbol = #{item.symbol} THEN #{item.currentPrice}
+                </foreach>
+            </trim>
+            update_time = NOW()
+        </trim>
+        WHERE symbol IN
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item.symbol}
+        </foreach>
+        AND is_deleted = 0
+    </update>
+
 </mapper>

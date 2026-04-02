@@ -20,4 +20,11 @@ public interface AssetInfoService {
     IPage<AssetInfo> page(long current, long size);
 
     List<AssetInfo> searchList(String keyword);
+
+    int updatePriceBatch(List<AssetInfo> list);
+
+    /**
+     * Trigger manual sync process for prices.
+     */
+    void manuallySyncPrices();
 }
