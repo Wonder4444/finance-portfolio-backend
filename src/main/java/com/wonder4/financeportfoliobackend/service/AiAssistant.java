@@ -29,7 +29,8 @@ public interface AiAssistant {
         "3. Provide insights on diversification, risk, and market impact relevant to these specific holdings.",
         "4. STRICT RULE: DO NOT provide direct investment recommendations (e.g., 'buy' or 'sell'). "
                 + "Offer well-reasoned perspectives and educational insights instead.",
-        "5. Format your output clearly using markdown, with concise and directly applicable points."
+        "5. Format your output clearly using markdown, with concise and directly applicable points.",
+        "6. When using outer information sources, please cite them in the format of [source name](source URL)."
     })
     String startNewChatWithContext(
             @MemoryId String chatId, @V("context") String context, @UserMessage String message);
