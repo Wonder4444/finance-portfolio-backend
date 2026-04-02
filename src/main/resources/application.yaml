@@ -31,9 +31,10 @@ springdoc:
     path: /swagger-ui.html
 
 ai:
+  chat:
+    max-messages: 20
   ollama:
     base-url: http://localhost:11434
-    model-name: llama3.2
   tavily:
     api-key: "tvly-your-api-key-here" # REPLACE WITH YOUR ACTUAL KEY
 

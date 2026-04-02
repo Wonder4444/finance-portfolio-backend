@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.wonder4.financeportfoliobackend.common.ApiResult;
 import com.wonder4.financeportfoliobackend.entity.AssetInfo;
 import com.wonder4.financeportfoliobackend.service.AssetInfoService;
+import com.wonder4.financeportfoliobackend.task.AssetPriceSyncTask;
 import com.wonder4.financeportfoliobackend.task.AssetSyncTask;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,16 +22,28 @@ public class AssetInfoController {
 
     private final AssetInfoService assetInfoService;
     private final AssetSyncTask assetSyncTask;
+    private final AssetPriceSyncTask assetPriceSyncTask;
 
-    public AssetInfoController(AssetInfoService assetInfoService, AssetSyncTask assetSyncTask) {
+    public AssetInfoController(
+            AssetInfoService assetInfoService,
+            AssetSyncTask assetSyncTask,
+            AssetPriceSyncTask assetPriceSyncTask) {
         this.assetInfoService = assetInfoService;
         this.assetSyncTask = assetSyncTask;
+        this.assetPriceSyncTask = assetPriceSyncTask;
     }
 
     @PostMapping("/sync")
-    @Operation(summary = "Manually trigger the asset sync task")
+    @Operation(summary = "Manually trigger the asset list sync task")
     public ApiResult<Void> triggerManualSync() {
         assetSyncTask.dailySync();
+        return ApiResult.success();
+    }
+
+    @PostMapping("/sync-prices")
+    @Operation(summary = "Manually trigger the 8000+ asset prices sync from Yahoo Finance")
+    public ApiResult<Void> triggerManualPriceSync() {
+        assetPriceSyncTask.syncPricesFromYahoo();
         return ApiResult.success();
     }
 
@@ -78,5 +91,17 @@ public class AssetInfoController {
             summary = "Fuzzy search assets globally by symbol or full name (capped at 50 results)")
     public ApiResult<List<AssetInfo>> search(@RequestParam String keyword) {
         return ApiResult.success(assetInfoService.searchList(keyword));
+    }
+
+    @GetMapping("/top-stocks")
+    @Operation(summary = "Get top 6 US companies by market cap")
+    public ApiResult<List<AssetInfo>> getTopStocks() {
+        return ApiResult.success(assetInfoService.getTopStocks());
+    }
+
+    @GetMapping("/top-cryptos")
+    @Operation(summary = "Get top 6 cryptocurrencies by market cap")
+    public ApiResult<List<AssetInfo>> getTopCryptos() {
+        return ApiResult.success(assetInfoService.getTopCryptos());
     }
 }

@@ -28,6 +28,18 @@ public class AssetInfo {
 
     private BigDecimal currentPrice;
 
+    private BigDecimal marketCap;
+
+    private BigDecimal changePercent;
+
+    private BigDecimal peRatio;
+
+    private BigDecimal psRatio;
+
+    private BigDecimal pbRatio;
+
+    private String industry;
+
     @TableLogic private Integer isDeleted;
 
     @TableField(fill = FieldFill.INSERT)

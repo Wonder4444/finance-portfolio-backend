@@ -3,7 +3,9 @@ package com.wonder4.financeportfoliobackend.service;
 import com.wonder4.financeportfoliobackend.dto.AiChatRequest;
 import com.wonder4.financeportfoliobackend.dto.AiChatResponse;
 import com.wonder4.financeportfoliobackend.dto.UserHoldingWithInfoDTO;
+import com.wonder4.financeportfoliobackend.factory.AiAssistantFactory;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -13,17 +15,18 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Profile("!test")
 public class AiChatService {
 
-    private final AiAssistant aiAssistant;
+    private final AiAssistantFactory aiAssistantFactory;
     private final UserHoldingService userHoldingService;
     private final ObjectMapper objectMapper;
 
     public AiChatService(
-            AiAssistant aiAssistant,
+            AiAssistantFactory aiAssistantFactory,
             UserHoldingService userHoldingService,
             ObjectMapper objectMapper) {
-        this.aiAssistant = aiAssistant;
+        this.aiAssistantFactory = aiAssistantFactory;
         this.userHoldingService = userHoldingService;
         this.objectMapper = objectMapper;
     }
@@ -31,6 +34,8 @@ public class AiChatService {
     public AiChatResponse chat(AiChatRequest request) {
         String chatId = request.getChatId();
         String reply;
+
+        AiAssistant aiAssistant = aiAssistantFactory.getAiAssistant(request.getModel());
 
         if (!StringUtils.hasText(chatId)) {
             // New conversation

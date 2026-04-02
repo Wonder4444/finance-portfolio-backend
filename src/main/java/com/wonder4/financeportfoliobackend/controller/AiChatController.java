@@ -7,6 +7,7 @@ import com.wonder4.financeportfoliobackend.service.AiChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/ai")
 @Tag(name = "AI Chat", description = "Endpoints for AI chat interactions")
+@Profile("!test")
 public class AiChatController {
 
     private final AiChatService aiChatService;

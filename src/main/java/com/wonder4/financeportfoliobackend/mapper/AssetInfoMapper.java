@@ -30,4 +30,10 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
 
     /** XML: 全局模糊搜索资产 (限制 50 条) */
     java.util.List<AssetInfo> searchAssets(@Param("keyword") String keyword);
+
+    /**
+     * Batch updates the current price of a list of assets based on their symbols. Prevents issuing
+     * 8000 updates to MySQL one by one.
+     */
+    int updatePriceBatch(@Param("list") java.util.List<AssetInfo> list);
 }

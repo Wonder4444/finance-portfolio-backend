@@ -63,22 +63,28 @@
 
     <!-- XML: 根据 userId 查询持仓列表并关联资产信息 -->
     <select id="selectByUserIdWithInfo" resultType="com.wonder4.financeportfoliobackend.dto.UserHoldingWithInfoDTO">
-        SELECT
-            uh.id,
-            uh.user_id AS userId,
-            uh.asset_id AS assetId,
-            uh.quantity,
-            uh.avg_cost AS avgCost,
-            uh.is_deleted AS isDeleted,
-            uh.create_time AS createTime,
-            uh.update_time AS updateTime,
-            ai.symbol,
-            ai.full_name AS fullName,
-            ai.asset_type AS assetType,
-            ai.current_price AS currentPrice
+        SELECT uh.id,
+               uh.user_id        AS userId,
+               uh.asset_id       AS assetId,
+               uh.quantity,
+               uh.avg_cost       AS avgCost,
+               uh.is_deleted     AS isDeleted,
+               uh.create_time    AS createTime,
+               uh.update_time    AS updateTime,
+               ai.symbol,
+               ai.full_name      AS fullName,
+               ai.asset_type     AS assetType,
+               ai.current_price  AS currentPrice,
+               ai.market_cap     AS marketCap,
+               ai.change_percent AS changePercent,
+               ai.pe_ratio       AS peRatio,
+               ai.ps_ratio       AS psRatio,
+               ai.pb_ratio       AS pbRatio,
+               ai.industry       AS industry
         FROM user_holding uh
-        LEFT JOIN asset_info ai ON uh.asset_id = ai.id AND ai.is_deleted = 0
-        WHERE uh.user_id = #{userId} AND uh.is_deleted = 0
+                 LEFT JOIN asset_info ai ON uh.asset_id = ai.id AND ai.is_deleted = 0
+        WHERE uh.user_id = #{userId}
+          AND uh.is_deleted = 0
         ORDER BY uh.id ASC
     </select>
 
