@@ -89,6 +89,30 @@ public class AssetInfoServiceImpl implements AssetInfoService {
     }
 
     @Override
+    public List<AssetInfo> getTopStocks() {
+        log.info("Fetching top 6 US stocks by market cap");
+        List<String> topSymbols = java.util.Arrays.asList("AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META");
+        List<AssetInfo> assets = assetInfoMapper.selectList(new QueryWrapper<AssetInfo>().in("symbol", topSymbols));
+        
+        // Sort to match the exact market cap ranking defined in topSymbols
+        return assets.stream()
+                .sorted(java.util.Comparator.comparingInt(a -> topSymbols.indexOf(a.getSymbol())))
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public List<AssetInfo> getTopCryptos() {
+        log.info("Fetching top 6 cryptocurrencies by market cap");
+        List<String> topSymbols = java.util.Arrays.asList("BTC-USD", "ETH-USD", "USDT-USD", "BNB-USD", "SOL-USD", "XRP-USD");
+        List<AssetInfo> assets = assetInfoMapper.selectList(new QueryWrapper<AssetInfo>().in("symbol", topSymbols));
+        
+        // Sort to match the exact market cap ranking defined in topSymbols
+        return assets.stream()
+                .sorted(java.util.Comparator.comparingInt(a -> topSymbols.indexOf(a.getSymbol())))
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
     public int updatePriceBatch(List<AssetInfo> list) {
         if (list == null || list.isEmpty()) return 0;
         return assetInfoMapper.updatePriceBatch(list);
