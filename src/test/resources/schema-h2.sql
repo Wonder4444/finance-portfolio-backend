@@ -18,14 +18,20 @@ CREATE TABLE user_info
 
 CREATE TABLE asset_info
 (
-    id            BIGINT          NOT NULL AUTO_INCREMENT,
-    symbol        VARCHAR(32)     NOT NULL,
-    full_name     VARCHAR(128)    NOT NULL,
-    asset_type    VARCHAR(32)     NOT NULL,
-    current_price DECIMAL(24, 10) NOT NULL DEFAULT 0,
-    is_deleted    TINYINT         NOT NULL DEFAULT 0,
-    create_time   DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time   DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id             BIGINT          NOT NULL AUTO_INCREMENT,
+    symbol         VARCHAR(32)     NOT NULL,
+    full_name      VARCHAR(128)    NOT NULL,
+    asset_type     VARCHAR(32)     NOT NULL,
+    current_price  DECIMAL(24, 10) NOT NULL DEFAULT 0,
+    market_cap     DECIMAL(24, 2)           DEFAULT NULL,
+    change_percent DECIMAL(10, 4)           DEFAULT NULL,
+    pe_ratio       DECIMAL(10, 4)           DEFAULT NULL,
+    ps_ratio       DECIMAL(10, 4)           DEFAULT NULL,
+    pb_ratio       DECIMAL(10, 4)           DEFAULT NULL,
+    industry       VARCHAR(128)             DEFAULT NULL,
+    is_deleted     TINYINT         NOT NULL DEFAULT 0,
+    create_time    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE (symbol)
 );

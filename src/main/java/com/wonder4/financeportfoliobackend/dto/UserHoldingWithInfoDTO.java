@@ -19,4 +19,13 @@ public class UserHoldingWithInfoDTO {
     private String symbol;
     private String fullName;
     private String assetType;
+
+    private BigDecimal currentPrice;
+    private BigDecimal marketCap;
+    private BigDecimal changePercent;
+    private BigDecimal peRatio;
+    private BigDecimal psRatio;
+    private BigDecimal pbRatio;
+
+    private String industry;
 }

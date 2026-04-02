@@ -91,9 +91,11 @@ public class AssetInfoServiceImpl implements AssetInfoService {
     @Override
     public List<AssetInfo> getTopStocks() {
         log.info("Fetching top 6 US stocks by market cap");
-        List<String> topSymbols = java.util.Arrays.asList("AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META");
-        List<AssetInfo> assets = assetInfoMapper.selectList(new QueryWrapper<AssetInfo>().in("symbol", topSymbols));
-        
+        List<String> topSymbols =
+                java.util.Arrays.asList("AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META");
+        List<AssetInfo> assets =
+                assetInfoMapper.selectList(new QueryWrapper<AssetInfo>().in("symbol", topSymbols));
+
         // Sort to match the exact market cap ranking defined in topSymbols
         return assets.stream()
                 .sorted(java.util.Comparator.comparingInt(a -> topSymbols.indexOf(a.getSymbol())))
@@ -103,9 +105,12 @@ public class AssetInfoServiceImpl implements AssetInfoService {
     @Override
     public List<AssetInfo> getTopCryptos() {
         log.info("Fetching top 6 cryptocurrencies by market cap");
-        List<String> topSymbols = java.util.Arrays.asList("BTC-USD", "ETH-USD", "USDT-USD", "BNB-USD", "SOL-USD", "XRP-USD");
-        List<AssetInfo> assets = assetInfoMapper.selectList(new QueryWrapper<AssetInfo>().in("symbol", topSymbols));
-        
+        List<String> topSymbols =
+                java.util.Arrays.asList(
+                        "BTC-USD", "ETH-USD", "USDT-USD", "BNB-USD", "SOL-USD", "XRP-USD");
+        List<AssetInfo> assets =
+                assetInfoMapper.selectList(new QueryWrapper<AssetInfo>().in("symbol", topSymbols));
+
         // Sort to match the exact market cap ranking defined in topSymbols
         return assets.stream()
                 .sorted(java.util.Comparator.comparingInt(a -> topSymbols.indexOf(a.getSymbol())))
@@ -120,7 +125,8 @@ public class AssetInfoServiceImpl implements AssetInfoService {
 
     @Override
     public void manuallySyncPrices() {
-        // Will be wired later or can directly call the SyncTask (but better to use Spring Context to get the task)
+        // Will be wired later or can directly call the SyncTask (but better to use Spring Context
+        // to get the task)
         log.info("Manual Yahoo Finance Sync Triggered.");
         // We will call the Task bean from the Controller. This service mapping can just delegate.
     }

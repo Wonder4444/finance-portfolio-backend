@@ -6,13 +6,15 @@
     <!-- 通用列 -->
     <sql id="baseColumns">
         id
-        , symbol, full_name, asset_type, current_price, is_deleted, create_time, update_time
+        , symbol, full_name, asset_type, current_price, market_cap, change_percent, pe_ratio, ps_ratio, pb_ratio, industry, is_deleted, create_time, update_time
     </sql>
 
     <!-- XML: 新增资产 (演示 XML insert 写法, 自增主键回填) -->
     <insert id="insertAsset" useGeneratedKeys="true" keyProperty="entity.id">
-        INSERT INTO asset_info (symbol, full_name, asset_type, current_price)
-        VALUES (#{entity.symbol}, #{entity.fullName}, #{entity.assetType}, #{entity.currentPrice})
+        INSERT INTO asset_info (symbol, full_name, asset_type, current_price, market_cap, change_percent, pe_ratio,
+                                ps_ratio, pb_ratio, industry)
+        VALUES (#{entity.symbol}, #{entity.fullName}, #{entity.assetType}, #{entity.currentPrice}, #{entity.marketCap},
+                #{entity.changePercent}, #{entity.peRatio}, #{entity.psRatio}, #{entity.pbRatio}, #{entity.industry})
     </insert>
 
     <!-- XML: 根据 id 查询资产 -->
@@ -34,14 +36,17 @@
 
     <!-- XML: Batch Upsert Assets (Sync Task) -->
     <insert id="insertOrUpdateBatch">
-        INSERT INTO asset_info (symbol, full_name, asset_type, current_price)
-        VALUES 
+        INSERT INTO asset_info (symbol, full_name, asset_type, current_price, market_cap, change_percent, pe_ratio,
+        ps_ratio, pb_ratio, industry)
+        VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.symbol}, #{item.fullName}, #{item.assetType}, IFNULL(#{item.currentPrice}, 0))
+            (#{item.symbol}, #{item.fullName}, #{item.assetType}, IFNULL(#{item.currentPrice}, 0), #{item.marketCap},
+            #{item.changePercent}, #{item.peRatio}, #{item.psRatio}, #{item.pbRatio}, #{item.industry})
         </foreach>
-        ON DUPLICATE KEY UPDATE 
-            full_name = VALUES(full_name),
-            asset_type = VALUES(asset_type)
+        ON DUPLICATE KEY UPDATE
+        full_name = VALUES(full_name),
+        asset_type = VALUES(asset_type),
+        industry = IFNULL(VALUES(industry), industry)
     </insert>
 
     <!-- XML: Global Fuzzy Search (Limits to 50 results) -->
@@ -52,8 +57,8 @@
         WHERE is_deleted = 0
         <if test="keyword != null and keyword != ''">
             AND (
-                symbol LIKE CONCAT('%', #{keyword}, '%')
-                OR full_name LIKE CONCAT('%', #{keyword}, '%')
+            symbol LIKE CONCAT('%', #{keyword}, '%')
+            OR full_name LIKE CONCAT('%', #{keyword}, '%')
             )
         </if>
         ORDER BY symbol ASC
@@ -66,7 +71,44 @@
         <trim prefix="SET" suffixOverrides=",">
             <trim prefix="current_price = CASE" suffix="END,">
                 <foreach collection="list" item="item" index="index">
-                    WHEN symbol = #{item.symbol} THEN #{item.currentPrice}
+                    WHEN symbol = #{item.symbol} AND #{item.currentPrice} IS NOT NULL THEN #{item.currentPrice}
+                    WHEN symbol = #{item.symbol} AND #{item.currentPrice} IS NULL THEN current_price
+                </foreach>
+            </trim>
+            <trim prefix="market_cap = CASE" suffix="END,">
+                <foreach collection="list" item="item" index="index">
+                    WHEN symbol = #{item.symbol} AND #{item.marketCap} IS NOT NULL THEN #{item.marketCap}
+                    WHEN symbol = #{item.symbol} AND #{item.marketCap} IS NULL THEN market_cap
+                </foreach>
+            </trim>
+            <trim prefix="change_percent = CASE" suffix="END,">
+                <foreach collection="list" item="item" index="index">
+                    WHEN symbol = #{item.symbol} AND #{item.changePercent} IS NOT NULL THEN #{item.changePercent}
+                    WHEN symbol = #{item.symbol} AND #{item.changePercent} IS NULL THEN change_percent
+                </foreach>
+            </trim>
+            <trim prefix="pe_ratio = CASE" suffix="END,">
+                <foreach collection="list" item="item" index="index">
+                    WHEN symbol = #{item.symbol} AND #{item.peRatio} IS NOT NULL THEN #{item.peRatio}
+                    WHEN symbol = #{item.symbol} AND #{item.peRatio} IS NULL THEN pe_ratio
+                </foreach>
+            </trim>
+            <trim prefix="ps_ratio = CASE" suffix="END,">
+                <foreach collection="list" item="item" index="index">
+                    WHEN symbol = #{item.symbol} AND #{item.psRatio} IS NOT NULL THEN #{item.psRatio}
+                    WHEN symbol = #{item.symbol} AND #{item.psRatio} IS NULL THEN ps_ratio
+                </foreach>
+            </trim>
+            <trim prefix="pb_ratio = CASE" suffix="END,">
+                <foreach collection="list" item="item" index="index">
+                    WHEN symbol = #{item.symbol} AND #{item.pbRatio} IS NOT NULL THEN #{item.pbRatio}
+                    WHEN symbol = #{item.symbol} AND #{item.pbRatio} IS NULL THEN pb_ratio
+                </foreach>
+            </trim>
+            <trim prefix="industry = CASE" suffix="END,">
+                <foreach collection="list" item="item" index="index">
+                    WHEN symbol = #{item.symbol} AND #{item.industry} IS NOT NULL THEN #{item.industry}
+                    WHEN symbol = #{item.symbol} AND #{item.industry} IS NULL THEN industry
                 </foreach>
             </trim>
             update_time = NOW()

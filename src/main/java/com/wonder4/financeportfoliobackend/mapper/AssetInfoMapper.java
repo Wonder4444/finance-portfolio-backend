@@ -32,8 +32,8 @@ public interface AssetInfoMapper extends BaseMapper<AssetInfo> {
     java.util.List<AssetInfo> searchAssets(@Param("keyword") String keyword);
 
     /**
-     * Batch updates the current price of a list of assets based on their symbols.
-     * Prevents issuing 8000 updates to MySQL one by one.
+     * Batch updates the current price of a list of assets based on their symbols. Prevents issuing
+     * 8000 updates to MySQL one by one.
      */
     int updatePriceBatch(@Param("list") java.util.List<AssetInfo> list);
 }

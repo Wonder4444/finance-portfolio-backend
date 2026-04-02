@@ -24,7 +24,10 @@ public class AssetInfoController {
     private final AssetSyncTask assetSyncTask;
     private final AssetPriceSyncTask assetPriceSyncTask;
 
-    public AssetInfoController(AssetInfoService assetInfoService, AssetSyncTask assetSyncTask, AssetPriceSyncTask assetPriceSyncTask) {
+    public AssetInfoController(
+            AssetInfoService assetInfoService,
+            AssetSyncTask assetSyncTask,
+            AssetPriceSyncTask assetPriceSyncTask) {
         this.assetInfoService = assetInfoService;
         this.assetSyncTask = assetSyncTask;
         this.assetPriceSyncTask = assetPriceSyncTask;
@@ -84,7 +87,8 @@ public class AssetInfoController {
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Fuzzy search assets globally by symbol or full name (capped at 50 results)")
+    @Operation(
+            summary = "Fuzzy search assets globally by symbol or full name (capped at 50 results)")
     public ApiResult<List<AssetInfo>> search(@RequestParam String keyword) {
         return ApiResult.success(assetInfoService.searchList(keyword));
     }
