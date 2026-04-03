@@ -26,6 +26,6 @@ public enum AiModel {
                 return model;
             }
         }
-        return null;
+        throw new IllegalArgumentException("Unsupported AI model: " + text);
     }
 }

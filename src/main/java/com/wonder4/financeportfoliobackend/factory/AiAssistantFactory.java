@@ -37,9 +37,7 @@ public class AiAssistantFactory {
     }
 
     public AiAssistant getAiAssistant(AiModel requestedModel) {
-        AiModel model = requestedModel != null ? requestedModel : AiModel.LLAMA_3_2;
-
-        return assistantCache.computeIfAbsent(model, this::createAiAssistant);
+        return assistantCache.computeIfAbsent(requestedModel, this::createAiAssistant);
     }
 
     private AiAssistant createAiAssistant(AiModel model) {
