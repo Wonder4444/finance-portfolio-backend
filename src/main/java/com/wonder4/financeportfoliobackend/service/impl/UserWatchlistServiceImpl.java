@@ -63,7 +63,9 @@ public class UserWatchlistServiceImpl implements UserWatchlistService {
         if (existing == null) {
             throw new BusinessException(404, "Watchlist record not found");
         }
-        userWatchlistMapper.deleteById(id);
+        // Custom update to set is_deleted = id for soft delete to free up unique constraint (user_id, asset_id, 0)
+        existing.setIsDeleted(id);
+        userWatchlistMapper.updateById(existing);
     }
 
     @Override

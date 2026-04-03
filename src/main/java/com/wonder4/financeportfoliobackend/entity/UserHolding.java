@@ -28,7 +28,7 @@ public class UserHolding {
 
     private BigDecimal avgCost;
 
-    @TableLogic private Integer isDeleted;
+    @TableLogic private Long isDeleted;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
