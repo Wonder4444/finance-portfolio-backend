@@ -9,10 +9,10 @@
         , user_id, asset_id, quantity, avg_cost, is_deleted, create_time, update_time
     </sql>
 
-    <!-- XML: 逻辑删除持仓 (UPDATE is_deleted) -->
+    <!-- XML: 逻辑删除持仓 (UPDATE is_deleted with ID to avoid unique index conflict) -->
     <update id="deleteHoldingById">
         UPDATE user_holding
-        SET is_deleted  = 1,
+        SET is_deleted  = id,
             update_time = NOW()
         WHERE id = #{id}
           AND is_deleted = 0

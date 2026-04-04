@@ -23,7 +23,7 @@ public class UserWatchlist {
 
     private Long assetId;
 
-    @TableLogic private Integer isDeleted;
+    @TableLogic private Long isDeleted;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
